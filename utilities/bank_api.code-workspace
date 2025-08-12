@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "bank_api",
+			"path": ".."
+		},
+		{
+			"name": "utilities",
+			"path": "../../ecommerce/utilities"
+		}
+	],
+	"settings": {}
+}
