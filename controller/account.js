@@ -1,4 +1,4 @@
-const Account = require("../models/account");
+const Account = require("account");
 const TokenStore = require("../models/tokenStore");
 const jwt = require("jsonwebtoken");
 const { uploadToCloudinary } = require("../utilities/cloudinary");
