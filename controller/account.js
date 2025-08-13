@@ -21,17 +21,14 @@ exports.createAccount = async (req, res) => {
       nextOfKin_phone,
       nextOfKin_relationship,
       password,
-      repeat_password,
-      pin,
-      account_currency,
       phone,
       address,
     } = req.body;
 
-    // 1. Check password match
-    if (password !== repeat_password) {
-      return res.status(400).json({ message: "Passwords do not match" });
-    }
+    // // 1. Check password match
+    // if (password !== repeat_password) {
+    //   return res.status(400).json({ message: "Passwords do not match" });
+    // }
     const existingUser = await Account.findOne({ email });
 
       if (existingUser) {
@@ -66,9 +63,6 @@ exports.createAccount = async (req, res) => {
       nextOfKin_phone,
       nextOfKin_relationship,
       password,
-      repeat_password,
-      pin,
-      account_currency,
       phone,
       address,
     });
@@ -95,7 +89,6 @@ exports.createAccount = async (req, res) => {
         account_number: account.account_number,
         email: account.email,
         balance: account.balance,
-        account_currency: account.account_currency,
       },
       token,
       data: account,
