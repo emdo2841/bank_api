@@ -21,9 +21,6 @@ exports.createAccount = async (req, res) => {
       nextOfKin_phone,
       nextOfKin_relationship,
       password,
-      repeat_password,
-      pin,
-      account_currency,
       phone,
       address,
     } = req.body;
