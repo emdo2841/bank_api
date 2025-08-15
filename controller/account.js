@@ -10,7 +10,7 @@ exports.createAccount = async (req, res) => {
     const imageUrl = req.file ? await uploadToCloudinary(req.file.path) : null;
     const {
       name,
-      email,
+      email,  
       gender,
       dob,
       occupation,
@@ -150,7 +150,7 @@ exports.login = async (req, res) => {
       accessToken,
       refreshToken,
       account: {
-        id: account._id,
+        _id: account._id,
         name: account.name, // not fullName unless you have it
         phone: account.phone,
         account_number: account.account_number,
@@ -161,29 +161,26 @@ exports.login = async (req, res) => {
         address: account.address,
       },
     });
+    console.log(accessToken, refreshToken);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
     console.log(error);
   }
 };
-
+// Client must send the refresh token
 exports.logout = async (req, res) => {
   try {
-    // The refresh token or access token should be sent from the client
-    const { token } = req.body;
+    const { refreshToken } = req.body;
 
-    if (!token) {
-      return res.status(400).json({ message: "Token is required for logout" });
+    if (!refreshToken) {
+      return res.status(400).json({ message: "Refresh token is required for logout" });
     }
 
-    // Remove the token from the DB
-    const deleted = await TokenStore.findOneAndDelete({ token });
+    const deleted = await TokenStore.findOneAndDelete({ token: refreshToken });
 
-    // if (!deleted) {
-    //   return res
-    //     .status(404)
-    //     .json({ message: "Token not found or already logged out" });
-    // }
+    if (!deleted) {
+      return res.status(404).json({ message: "Token not found or already logged out" });
+    }
 
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
@@ -192,23 +189,23 @@ exports.logout = async (req, res) => {
   }
 };
 
-
-
 exports.update_account = async (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
+    let updateData = { ...req.body };
 
-    // Check if account exists
-    const account = await Account.findByIdAndUpdate(id, updateData, { new: true });
-    if (!account) {
-      return res.status(404).json({ message: "Account not found" });
-    }
-
-    // Update account
     if (req.file) {
       const imageUrl = await uploadToCloudinary(req.file.path);
-      account.image = imageUrl;
+      updateData.image = imageUrl;
+    }
+
+    const account = await Account.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: false, // don't re-validate all required fields
+    });
+
+    if (!account) {
+      return res.status(404).json({ message: "Account not found" });
     }
 
     res.status(200).json({
@@ -219,4 +216,25 @@ exports.update_account = async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
-}
+};
+
+
+exports.delete_account = async (req, res) => {
+  try {
+    const  id  = req.params.id || req.user.id; // Use req.user.id if available, otherwise use id from params
+    const account = await Account.findByIdAndDelete(id);
+    
+    if (!account) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+    
+
+    res.status(200).json({
+      message: "Account deleted successfully",
+      data: account,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

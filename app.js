@@ -18,7 +18,7 @@ const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 app.use(helmet());
 
-app.use(cors());
+app.use(cors({ origin: "*" })); 
 
 app.use(cookieParser());
 
