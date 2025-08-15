@@ -115,28 +115,34 @@ exports.getAccount = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 }
-
 exports.login = async (req, res) => {
   try {
-    const { account_number, password } = req.body;
+    console.log("Request body:", req.body);
+    const { account_number, password } = req.body || {};
+     console.log("Request body:", req.body);
 
-    // Find user by email
+    if (!account_number || !password) {
+      return res
+        .status(400)
+        .json({ message: "account_number and password are required" });
+    }
+
     const account = await Account.findOne({ account_number });
     if (!account) {
-      return res.status(401).json({ message: "Invalid account_number or password" });
+      return res
+        .status(401)
+        .json({ message: "Invalid account_number or password" });
     }
 
-    // Check password
     const isMatch = await account.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid account_number or password" });
+      return res
+        .status(401)
+        .json({ message: "Invalid account_number or password" });
     }
 
-    // Generate tokens
     const accessToken = generateToken(account);
     const refreshToken = generateRefreshToken(account);
-
-    // Save refresh token in the database
     await TokenStore.create({ token: refreshToken, account: account._id });
 
     res.status(200).json({
@@ -145,22 +151,48 @@ exports.login = async (req, res) => {
       refreshToken,
       account: {
         id: account._id,
-        name: account.fullName,
+        name: account.name, // not fullName unless you have it
         phone: account.phone,
         account_number: account.account_number,
         role: account.role,
         image: account.image,
         balance: account.balance,
-        account_currency: account.account_currency,
         email: account.email,
         address: account.address,
-        
       },
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
+    console.log(error);
   }
 };
+
+exports.logout = async (req, res) => {
+  try {
+    // The refresh token or access token should be sent from the client
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ message: "Token is required for logout" });
+    }
+
+    // Remove the token from the DB
+    const deleted = await TokenStore.findOneAndDelete({ token });
+
+    // if (!deleted) {
+    //   return res
+    //     .status(404)
+    //     .json({ message: "Token not found or already logged out" });
+    // }
+
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 
 exports.update_account = async (req, res) => {
   try {

@@ -12,14 +12,18 @@ const AccountSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, unique: true, required: true },
-    gender: { type: String, required: true },
-    dob: { type: Date},
-    occupation: { type: String},
+    gender: {
+      type: String,
+      required: true,
+      enum: ["female", "male", "other"]
+    },
+    dob: { type: Date },
+    occupation: { type: String },
     country: { type: String, required: true },
     city: { type: String, required: true },
     nextOfKin_name: { type: String, required: true },
-    nextOfKin_email: { type: String, required: true},
-    nextOfKin_phone: { type: String, required: true, },
+    nextOfKin_email: { type: String, required: true },
+    nextOfKin_phone: { type: String, required: true },
     nextOfKin_relationship: { type: String, required: true },
     account_number: { type: Number, unique: true },
     password: { type: String, required: true },
