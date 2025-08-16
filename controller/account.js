@@ -28,9 +28,9 @@ exports.createAccount = async (req, res) => {
     } = req.body;
 
     // // 1. Check password match
-    if (password !== repeat_password) {
-      return res.status(400).json({ message: "Passwords do not match" });
-    }
+    // if (password !== repeat_password) {
+    //   return res.status(400).json({ message: "Passwords do not match" });
+    // }
     const existingUser = await Account.findOne({ email });
 
       if (existingUser) {
