@@ -15,7 +15,7 @@ const AccountSchema = new mongoose.Schema(
     gender: {
       type: String,
       required: true,
-      enum: ["female", "male", "other"]
+      enum: ["Female", "Male", "Other"]
     },
     dob: { type: Date },
     occupation: { type: String },
