@@ -10,25 +10,27 @@ exports.createAccount = async (req, res) => {
     const imageUrl = req.file ? await uploadToCloudinary(req.file.path) : null;
     const {
       name,
-      email,  
+      email,
       gender,
       dob,
       occupation,
       country,
+      state,
       city,
       nextOfKin_name,
       nextOfKin_email,
       nextOfKin_phone,
       nextOfKin_relationship,
       password,
+      repeat_password,
       phone,
       address,
     } = req.body;
 
     // // 1. Check password match
-    // if (password !== repeat_password) {
-    //   return res.status(400).json({ message: "Passwords do not match" });
-    // }
+    if (password !== repeat_password) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
     const existingUser = await Account.findOne({ email });
 
       if (existingUser) {
@@ -57,12 +59,14 @@ exports.createAccount = async (req, res) => {
       dob,
       occupation,
       country,
+      state,
       city,
       nextOfKin_name,
       nextOfKin_email,
       nextOfKin_phone,
       nextOfKin_relationship,
       password,
+      repeat_password,
       phone,
       address,
     });
@@ -77,7 +81,7 @@ exports.createAccount = async (req, res) => {
     // 4. Store token in DB
     await TokenStore.create({
       token,
-      user: account._id,
+      account: account._id,
     });
 
     // 5. Respond
